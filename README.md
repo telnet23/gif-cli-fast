@@ -14,17 +14,23 @@ Usage
 -
 
 ```
-usage: gif [-h] [--provider {giphy,tenor,local}] [--cache CACHE] [--mode {ascii,256color,truecolor}] [--cols COLS] [--rows ROWS] [query ...]
+usage: gif [-h] [--provider {giphy,tenor,local}]
+           [--mode {ascii,256color,truecolor}] [--cols COLS] [--rows ROWS]
+           [--cache CACHE]
+           [query ...]
 
 positional arguments:
-  query                 query to submit to provider. a trending gif is returned by default
+  query                 query to submit to provider. a trending gif is
+                        returned by default
 
 options:
   -h, --help            show this help message and exit
   --provider {giphy,tenor,local}
-                        provider to submit query to. giphy by default
+                        provider to submit query to. giphy by default. giphy
+                        by default
   --mode {ascii,256color,truecolor}
-                        display mode. ascii by default
+                        display mode. ascii by default. truecolor only
+                        supported on some terminals
   --cols COLS           terminal size. determined automatically by default
   --rows ROWS           terminal size. determined automatically by default
   --cache CACHE         cache directory. determined automatically by default
