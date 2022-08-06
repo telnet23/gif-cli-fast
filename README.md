@@ -38,11 +38,19 @@ Examples
 ```
 $ gif happy birthday
 $ gif --provider giphy happy birthday
+$ gif --mode 256color happy birthday
 $ gif --provider local ~/gifs/happy-birthday.gif
 ```
 
-Preferences
+Shell Alias Examples
 -
+If you prefer `--mode 256color` and want short aliases for each provider, then you could add the following to your `.bashrc` or `.zshrc`, for example:
+```bash
+alias tgif="gif --provider tenor --mode 256color"
+alias ggif="gif --provider giphy --mode 256color"
+alias lgif="gif --provider local --mode 256color"
 ```
-$ alias gif="gif --provider giphy --mode 256color"
-```
+
+True Color
+-
+Note that True Color (enabled by `--mode truecolor`) is only supported in [some terminals](https://github.com/termstandard/colors#truecolor-support-in-output-devices).
