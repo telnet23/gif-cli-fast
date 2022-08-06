@@ -19,7 +19,7 @@ def main():
         "--provider",
         choices=providers,
         default=providers[0],
-        help=f"provider to submit query to. giphy by default. {providers[0]} by default",
+        help=f"provider to submit query to. {providers[0]} by default",
     )
     parser.add_argument(
         "--mode",

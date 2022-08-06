@@ -26,8 +26,7 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   --provider {giphy,tenor,local}
-                        provider to submit query to. giphy by default. giphy
-                        by default
+                        provider to submit query to. giphy by default
   --mode {ascii,256color,truecolor}
                         display mode. ascii by default. truecolor only
                         supported on some terminals
