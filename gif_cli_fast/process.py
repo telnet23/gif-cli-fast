@@ -30,8 +30,9 @@ def process(content, size, mode):
     GifImagePlugin.LOADING_STRATEGY = GifImagePlugin.LoadingStrategy.RGB_ALWAYS
     image = Image.open(BytesIO(content))
 
-    scale = min(size[0] / image.size[0], size[1] / image.size[1], 1)
-    size = int(scale * image.size[0]), int(scale * image.size[1])
+    imsize = image.size[0] * 2, image.size[1]
+    scale = min(size[0] / imsize[0], size[1] / imsize[1], 1)
+    imsize = int(scale * imsize[0]), int(scale * imsize[1])
 
     processor = _PROCESSORS[mode]
 
@@ -45,9 +46,9 @@ def process(content, size, mode):
                     home,
                     "".join(
                         "".join(
-                            (processor(*color), end if index % -size[0] == -1 else "")
+                            (processor(*color), end if index % -imsize[0] == -1 else "")
                         )
-                        for index, color in enumerate(frame.resize(size).getdata())
+                        for index, color in enumerate(frame.resize(imsize).getdata())
                     ),
                 )
             ),
