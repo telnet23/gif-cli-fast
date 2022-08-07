@@ -51,7 +51,7 @@ def load(provider, query, cache):
 
 def _get(url, cache):
     os.makedirs(cache, exist_ok=True)
-    os.chdir(cache)
+    os.chdir(os.path.abspath(cache))
 
     key = base64.b64encode(url.encode("ascii")).decode("ascii").replace("/", "_")
 
