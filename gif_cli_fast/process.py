@@ -1,28 +1,56 @@
+from itertools import groupby
 from io import BytesIO
 from PIL import GifImagePlugin, Image, ImageSequence
 
 import py256color
 
 
-def _ascii(r, g, b):
-    # These are the characters and weights used in jp2a by default
-    # https://manpages.ubuntu.com/manpages/bionic/man1/jp2a.1.html
-    CHARS = "   ...',;:clodxkO0KXNWM"
-    return CHARS[round((0.2989 * r + 0.5866 * g + 0.1145 * b) / 255 * (len(CHARS) - 1))]
+class _Ascii:
+    @staticmethod
+    def pre(color):
+        red, green, blue = color
+        # These are the characters and weights used in jp2a by default
+        # https://manpages.ubuntu.com/manpages/bionic/man1/jp2a.1.html
+        characters = "   ...',;:clodxkO0KXNWM"
+        intensity = (0.2989 * red + 0.5866 * green + 0.1145 * blue) / 255
+        return characters[round(intensity * (len(characters) - 1))]
+
+    @staticmethod
+    def post(key, length):
+        return key * length
+
+    reset = ""
 
 
-def _256color(r, g, b):
-    return "\x1B[48;5;{:d}m ".format(py256color.from_rgb(r, g, b))
+class _256Color:
+    @staticmethod
+    def pre(color):
+        return py256color.from_rgb(*color)
+
+    @staticmethod
+    def post(key, length):
+        return f"\x1B[48;5;{key:d}m" + " " * length
+
+    reset = "\x1B[m"
 
 
-def _truecolor(r, g, b):
-    return f"\x1B[48;2;{r:d};{g:d};{b:d}m "
+class _TrueColor:
+    @staticmethod
+    def pre(color):
+        return color
+
+    @staticmethod
+    def post(key, length):
+        red, green, blue = key
+        return f"\x1B[48;2;{red:d};{green:d};{blue:d}m" + " " * length
+
+    reset = "\x1B[m"
 
 
 _PROCESSORS = {
-    "ascii": _ascii,
-    "256color": _256color,
-    "truecolor": _truecolor,
+    "ascii": _Ascii,
+    "256color": _256Color,
+    "truecolor": _TrueColor,
 }
 
 
@@ -36,23 +64,28 @@ def process(content, size, mode):
 
     processor = _PROCESSORS[mode]
 
-    home = "" if mode == "ascii" else "\x1B[H"
-    end = "\n" if mode == "ascii" else "\x1B[0m\n"
-
     return [
-        [
-            "".join(
-                (
-                    home,
-                    "".join(
+        (
+            "\n".join(
+                "".join(
+                    (
                         "".join(
-                            (processor(*color), end if index % -imsize[0] == -1 else "")
-                        )
-                        for index, color in enumerate(frame.resize(imsize).getdata())
-                    ),
+                            processor.post(key, len(list(streak)))
+                            for key, streak in groupby(
+                                processor.pre(color) for color in row
+                            )
+                        ),
+                        processor.reset,
+                    )
                 )
+                for row in _matrix(frame.resize(imsize).getdata(), imsize[0])
             ),
             frame.info["duration"] / 1000,
-        ]
+        )
         for frame in ImageSequence.Iterator(image)
     ]
+
+
+def _matrix(iterable, length):
+    args = [iter(iterable)] * length
+    return zip(*args)

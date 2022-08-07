@@ -1,5 +1,4 @@
 import argparse
-import functools
 import os
 import signal
 import sys
@@ -64,11 +63,12 @@ def main():
     frames = process(content, (args.cols, args.rows), args.mode)
     while True:
         for output, duration in frames:
+            print("\x1B[H", end="", flush=True)
             print(output, end="", flush=True)
             time.sleep(duration)
 
 
-def interrupt(sig, frame):
+def interrupt(_sig, _frame):
     print("\x1B[?25h", end="", flush=True)
     sys.exit(0)
 
